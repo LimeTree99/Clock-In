@@ -6,8 +6,56 @@ from curses.textpad import Textbox, rectangle
 
 
 class Task:
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
+        
+class Pad:
+    def __init__(self, nrow: int, ncol: int, vec: tuple[int, int]):
+        self.nrow = nrow
+        self.ncol = ncol 
+        self.vec = vec
+        
+        self._pad = curses.newpad(self.nrow, self.ncol)
+        
+    def attron(self, attr: int):
+        self._pad.attron(attr)
+        
+    def attroff(self, attr: int):
+        self._pad.attroff(attr)
+        
+    def addstr(self, str: str, vec: tuple[int, int]=None, attr: int=None):
+        """
+        Add string to Pad
+
+        Parameters
+        ----------
+        str: str
+            The string to be added to the pad
+        vec: [x: int, y: int]
+            location for string to begin
+        attr: int
+            curses attributes  
+        """
+        
+        if attr == None and vec == None:
+            self._pad.addstr(str)
+        elif attr != None and vec == None:
+            self._pad.addstr(str, attr)
+        elif attr == None and vec != None:
+            self._pad.addstr(vec[1], vec[0], str)
+        else:
+            self._pad.addstr(vec[1], vec[0], str, attr)
+        
+    def draw(self):
+        self._pad.refresh(0,0, 
+                          self.vec[1], self.vec[0], 
+                          self.vec[1] + self.nrow, self.vec[0] + self.ncol)
+        
+    
+    
+class Drop_menu(Pad):
+    def __init__(self, nrow: int, ncol: int):
+        super().__init__(nrow, ncol)
 
 
 def main(stdscr):
@@ -20,7 +68,7 @@ def main(stdscr):
     #stdscr.nodelay(True)
     curses.curs_set(0)
     
-    win = curses.newwin(0, 18, 4, 1)
+    
     
     
     
@@ -28,14 +76,16 @@ def main(stdscr):
     stdscr.addstr(1,1, "Clock In")
     stdscr.refresh()
     
-    win.attron(COLOR_GREEN)
+    tasks_pad = Pad(15,18, [1, 3])
+    tasks_pad.attron(COLOR_GREEN)
     
     tasks = ["T1", "task 2", "other thing 3"]
-    
     for task in tasks:
-        win.addstr(task + '\n')
-        
-    win.refresh()
+        tasks_pad.addstr(task + '\n')
+    
+    tasks_pad.draw()
+    
+    
     
     
     
