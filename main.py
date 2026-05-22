@@ -1,7 +1,7 @@
 import time
 import curses
 from curses import wrapper
-from curses.textpad import Textbox, rectangle
+from curses.textpad import rectangle
 
 
 
@@ -31,7 +31,7 @@ class Pad:
         ----------
         str: str
             The string to be added to the pad
-        vec: [x: int, y: int]
+        vec: [x,y]
             location for string to begin
         attr: int
             curses attributes  
@@ -53,9 +53,37 @@ class Pad:
         
     
     
-class Drop_menu(Pad):
-    def __init__(self, nrow: int, ncol: int):
-        super().__init__(nrow, ncol)
+class List_menu(Pad):
+    def __init__(self, nrow, ncol, vec, items: list):
+        super().__init__(nrow, ncol, vec)
+        self.items = items
+        self.selected = None
+        
+    def update(self):
+        pass
+    
+    
+class Timer(Pad):
+    def __init__(self, nrow, ncol, vec):
+        super().__init__(nrow, ncol, vec)
+        self.task = None
+        self.active = False
+        self.start = None
+        
+    def settask(self, task):
+        self.task = task
+        
+    def start(self):
+        self.start = time.time()
+        
+    def stop(self):
+        pass
+    
+    def draw(self):
+        self.addstr("thing | 11:02")
+        return super().draw()
+        
+        
 
 
 def main(stdscr):
@@ -76,16 +104,25 @@ def main(stdscr):
     stdscr.addstr(1,1, "Clock In")
     stdscr.refresh()
     
-    tasks_pad = Pad(15,18, [1, 3])
-    tasks_pad.attron(COLOR_GREEN)
+    timer = Timer(1, 15, [20, 1])
+    
+    
+    
+    tasks_menu = Pad(15, 18, [1, 3])
+    tasks_menu.attron(COLOR_GREEN)
     
     tasks = ["T1", "task 2", "other thing 3"]
     for task in tasks:
-        tasks_pad.addstr(task + '\n')
+        tasks_menu.addstr(task + '\n')
     
-    tasks_pad.draw()
+    tasks_menu.draw()
+    timer.draw()
     
     
+    
+    end = False
+    while not end:
+        pass
     
     
     
