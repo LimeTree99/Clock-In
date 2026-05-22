@@ -1,4 +1,5 @@
 import time
+from datetime import timedelta
 import curses
 from curses import wrapper
 from curses.textpad import rectangle
@@ -36,6 +37,7 @@ class Pad:
         attr: int
             curses attributes  
         """
+        assert len(str) < self.nrow * self.ncol, "str too long for Pad"
         
         if attr == None and vec == None:
             self._pad.addstr(str)
@@ -60,7 +62,10 @@ class List_menu(Pad):
         self.selected = None
         
     def update(self):
-        pass
+        self._pad.clear()
+        for item in self.items:
+            self.addstr(f"{item}\n")
+        self.draw()
     
     
 class Timer(Pad):
@@ -68,22 +73,57 @@ class Timer(Pad):
         super().__init__(nrow, ncol, vec)
         self.task = None
         self.active = False
-        self.start = None
+        self.timestart = None
         
     def settask(self, task):
         self.task = task
         
     def start(self):
-        self.start = time.time()
+        self.timestart = time.time()
         
     def stop(self):
         pass
     
+    def update(self):
+        pass
+    
+    def gettime(self):
+        timestr = ""
+        if self.timestart == None:
+            timestr = "00:00"
+        else:
+            timestr = str(timedelta(seconds=time.time()-self.timestart))
+        
+        return timestr
+    
     def draw(self):
-        self.addstr("thing | 11:02")
+        self._pad.clear()
+        if self.task == None:
+            task = "Select a task"
+        else: 
+            task = self.task
+            
+        self.addstr(f"{task} | {self.gettime()}")
         return super().draw()
         
+class Delay:
+    def __init__(self):
+        self.start = time.time()
         
+    def delay(self, seconds: float):
+        """
+        Run a busy loop until the seconds elapsed from the last call is reached.
+        
+        Returns
+        -------
+        (bool): True if time was delayed, False if there was delay exicuted
+        """
+        delayed = False
+        while time.time() - self.start < seconds:
+            delayed = True
+            
+        self.start = time.time()            
+        return delayed
 
 
 def main(stdscr):
@@ -104,25 +144,29 @@ def main(stdscr):
     stdscr.addstr(1,1, "Clock In")
     stdscr.refresh()
     
-    timer = Timer(1, 15, [20, 1])
+    #init
+    timer = Timer(1, 50, [20, 1])
     
-    
-    
-    tasks_menu = Pad(15, 18, [1, 3])
+    tasks_menu = List_menu(15, 18, [1, 3], ["T1", "task 2", "other thing 3"])
     tasks_menu.attron(COLOR_GREEN)
     
-    tasks = ["T1", "task 2", "other thing 3"]
-    for task in tasks:
-        tasks_menu.addstr(task + '\n')
-    
-    tasks_menu.draw()
-    timer.draw()
+    timer.start()
     
     
+    delay = Delay()
     
     end = False
     while not end:
-        pass
+        
+        #update
+        tasks_menu.update()
+        
+        #draw
+        tasks_menu.draw()
+        timer.draw()
+        
+        
+        delay.delay(1/30)
     
     
     
