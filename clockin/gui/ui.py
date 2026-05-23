@@ -1,15 +1,9 @@
+import curses
 import time
 from datetime import timedelta
-import curses
-from curses import wrapper
-from curses.textpad import rectangle
 
 
 
-class Task:
-    def __init__(self, name: str):
-        self.name = name
-        
 class Pad:
     def __init__(self, nrow: int, ncol: int, vec: tuple[int, int]):
         self.nrow = nrow
@@ -92,7 +86,7 @@ class Timer(Pad):
         if self.timestart == None:
             timestr = "00:00"
         else:
-            timestr = str(timedelta(seconds=time.time()-self.timestart))
+            timestr = str(timedelta(seconds=int(time.time()-self.timestart)))
         
         return timestr
     
@@ -105,73 +99,3 @@ class Timer(Pad):
             
         self.addstr(f"{task} | {self.gettime()}")
         return super().draw()
-        
-class Delay:
-    def __init__(self):
-        self.start = time.time()
-        
-    def delay(self, seconds: float):
-        """
-        Run a busy loop until the seconds elapsed from the last call is reached.
-        
-        Returns
-        -------
-        (bool): True if time was delayed, False if there was delay exicuted
-        """
-        delayed = False
-        while time.time() - self.start < seconds:
-            delayed = True
-            
-        self.start = time.time()            
-        return delayed
-
-
-def main(stdscr):
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    COLOR_GREEN = curses.color_pair(1)
-    COLOR_RED = curses.color_pair(2)
-    COLOR_BLUE = curses.color_pair(3)
-    #stdscr.nodelay(True)
-    curses.curs_set(0)
-    
-    
-    
-    
-    
-    rectangle(stdscr, 0,0, 2,9)
-    stdscr.addstr(1,1, "Clock In")
-    stdscr.refresh()
-    
-    #init
-    timer = Timer(1, 50, [20, 1])
-    
-    tasks_menu = List_menu(15, 18, [1, 3], ["T1", "task 2", "other thing 3"])
-    tasks_menu.attron(COLOR_GREEN)
-    
-    timer.start()
-    
-    
-    delay = Delay()
-    
-    end = False
-    while not end:
-        
-        #update
-        tasks_menu.update()
-        
-        #draw
-        tasks_menu.draw()
-        timer.draw()
-        
-        
-        delay.delay(1/30)
-    
-    
-    
-    
-    stdscr.getch()
-
-if __name__ == "__main__":
-    wrapper(main)

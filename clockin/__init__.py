@@ -1,0 +1,1 @@
+from clockin.core.main import main
