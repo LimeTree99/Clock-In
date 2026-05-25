@@ -5,6 +5,7 @@ from curses.textpad import rectangle
 
 from clockin.gui.ui import List_menu, Timer, Pad
 from clockin.core.util import Delay
+from clockin.core.keys import Keys
 
 
 
@@ -20,8 +21,9 @@ def app(stdscr):
     COLOR_GREEN = curses.color_pair(1)
     COLOR_RED = curses.color_pair(2)
     COLOR_BLUE = curses.color_pair(3)
-    #stdscr.nodelay(True)
     curses.curs_set(0)
+    
+    keys = Keys(stdscr)
     
     logo = Pad(8, 1, [1,1], bd=True)
     logo.addstr("Clock In")
@@ -44,6 +46,9 @@ def app(stdscr):
         
         #update
         tasks_menu.update()
+        keys.update()
+        
+        log.addstr(keys.usekey(), (0,0))
         
         #draw
         tasks_menu.draw()
