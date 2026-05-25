@@ -3,7 +3,7 @@ import curses
 from curses import wrapper
 from curses.textpad import rectangle
 
-from clockin.gui.ui import List_menu, Timer
+from clockin.gui.ui import List_menu, Timer, Pad
 from clockin.core.util import Delay
 
 
@@ -23,22 +23,21 @@ def app(stdscr):
     #stdscr.nodelay(True)
     curses.curs_set(0)
     
-    
-    rectangle(stdscr, 0,0, 2,9)
-    stdscr.addstr(1,1, "Clock In")
-    stdscr.refresh()
+    logo = Pad(9, 1, [1,1], bd=True)
+    logo.addstr("Clock In")
+    logo.draw()
     
     #init
-    timer = Timer(1, 50, [20, 1])
+    timer = Timer(50, 1, [20, 1])
+    tasks_menu = List_menu(18, 15, [1, 3], ["T1", "task 2", "other thing 3"])
+    log = Pad(50, 5, (1, 18), bd=True)
     
-    tasks_menu = List_menu(15, 18, [1, 3], ["T1", "task 2", "other thing 3"])
-    tasks_menu.attron(COLOR_GREEN)
+    log.addstr("hi "*82)
     
     timer.start()
     
     
     delay = Delay()
-    
     end = False
     while not end:
         
@@ -48,6 +47,7 @@ def app(stdscr):
         #draw
         tasks_menu.draw()
         timer.draw()
+        log.draw()
         
         
         delay.delay(1/30)

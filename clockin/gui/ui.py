@@ -3,14 +3,32 @@ import time
 from datetime import timedelta
 
 
+class Pad_defalts:
+    def __init__(self):
+        self.bd = False
 
-class Pad:
-    def __init__(self, nrow: int, ncol: int, vec: tuple[int, int]):
-        self.nrow = nrow
-        self.ncol = ncol 
+
+
+class Pad(Pad_defalts):
+    def __init__(self, width: int, height: int, vec: tuple[int, int], **kargs: dict):
+        super().__init__()
+        self.height = height
+        self.width = width
         self.vec = vec
         
-        self._pad = curses.newpad(self.nrow, self.ncol)
+        self.__dict__ = self.__dict__ | kargs
+        
+        self._pad = curses.newpad(self.height, self.width)
+        if self.bd:
+            self._bd_pad = curses.newpad(self.height + 3, self.width + 2)
+            self._create_bd()
+            
+    def _create_bd(self):
+        self._bd_pad.addstr("┌" + "─" * self.width + "┐")
+        for i in range(self.height):
+            self._bd_pad.addch(i+1, 0, "│")
+            self._bd_pad.addch(i+1, self.width+1, "│")
+        self._bd_pad.addstr(self.height + 1, 0, "└" + "─" * self.width + "┘")
         
     def attron(self, attr: int):
         self._pad.attron(attr)
@@ -31,7 +49,7 @@ class Pad:
         attr: int
             curses attributes  
         """
-        assert len(str) < self.nrow * self.ncol, "str too long for Pad"
+        assert len(str) <= self.height * self.width, "str too long for Pad"
         
         if attr == None and vec == None:
             self._pad.addstr(str)
@@ -43,15 +61,23 @@ class Pad:
             self._pad.addstr(vec[1], vec[0], str, attr)
         
     def draw(self):
+        if self.bd:
+            self._bd_pad.refresh(0,0, 
+                                 self.vec[1] - 1, 
+                                 self.vec[0] - 1, 
+                                 self.vec[1] + self.height + 1, 
+                                 self.vec[0] + self.width + 1)
         self._pad.refresh(0,0, 
-                          self.vec[1], self.vec[0], 
-                          self.vec[1] + self.nrow, self.vec[0] + self.ncol)
+                          self.vec[1], 
+                          self.vec[0], 
+                          self.vec[1] + self.height, 
+                          self.vec[0] + self.width)
         
     
     
 class List_menu(Pad):
-    def __init__(self, nrow, ncol, vec, items: list):
-        super().__init__(nrow, ncol, vec)
+    def __init__(self, width: int,  height: int, vec, items: list):
+        super().__init__(width, height, vec)
         self.items = items
         self.selected = None
         
@@ -63,8 +89,8 @@ class List_menu(Pad):
     
     
 class Timer(Pad):
-    def __init__(self, nrow, ncol, vec):
-        super().__init__(nrow, ncol, vec)
+    def __init__(self, width: int, height: int, vec):
+        super().__init__(width, height, vec)
         self.task = None
         self.active = False
         self.timestart = None
