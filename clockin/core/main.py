@@ -23,7 +23,7 @@ def app(stdscr):
     #stdscr.nodelay(True)
     curses.curs_set(0)
     
-    logo = Pad(9, 1, [1,1], bd=True)
+    logo = Pad(8, 1, [1,1], bd=True)
     logo.addstr("Clock In")
     logo.draw()
     
@@ -32,7 +32,8 @@ def app(stdscr):
     tasks_menu = List_menu(18, 15, [1, 3], ["T1", "task 2", "other thing 3"])
     log = Pad(50, 5, (1, 18), bd=True)
     
-    log.addstr("hi "*82)
+    log.addstr("?"*(6*50))
+    log.addstr(f" <{log._pad.getyx()}> ", (0,0))
     
     timer.start()
     

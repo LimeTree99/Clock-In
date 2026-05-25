@@ -19,8 +19,10 @@ class Pad(Pad_defalts):
         self.__dict__ = self.__dict__ | kargs
         
         self._pad = curses.newpad(self.height, self.width)
+        self._buff = ""
         if self.bd:
-            self._bd_pad = curses.newpad(self.height + 3, self.width + 2)
+            # lower right corner "quirk"              \/  sould be 2
+            self._bd_pad = curses.newpad(self.height + 2, self.width + 2) 
             self._create_bd()
             
     def _create_bd(self):
@@ -28,7 +30,17 @@ class Pad(Pad_defalts):
         for i in range(self.height):
             self._bd_pad.addch(i+1, 0, "│")
             self._bd_pad.addch(i+1, self.width+1, "│")
-        self._bd_pad.addstr(self.height + 1, 0, "└" + "─" * self.width + "┘")
+        self._bd_pad.addstr(self.height + 1, 0, "└" + "─" * self.width)
+        
+        # rediculus workaround to the lower right corner "quirk"
+        try:
+            self._bd_pad.addch("┘")
+        except curses.error as e:
+            if "returned ERR" in str(e): # Common message for the quirk
+                pass
+            else:
+                raise
+        
         
     def attron(self, attr: int):
         self._pad.attron(attr)
@@ -36,9 +48,9 @@ class Pad(Pad_defalts):
     def attroff(self, attr: int):
         self._pad.attroff(attr)
         
-    def addstr(self, str: str, vec: tuple[int, int]=None, attr: int=None):
+    def addstr(self, string: str, vec: tuple[int, int]=None, attr: int=curses.A_NORMAL):
         """
-        Add string to Pad
+        Add string to Pad, automatically truncates out of bounds strings
 
         Parameters
         ----------
@@ -49,16 +61,25 @@ class Pad(Pad_defalts):
         attr: int
             curses attributes  
         """
-        assert len(str) <= self.height * self.width, "str too long for Pad"
-        
-        if attr == None and vec == None:
-            self._pad.addstr(str)
-        elif attr != None and vec == None:
-            self._pad.addstr(str, attr)
-        elif attr == None and vec != None:
-            self._pad.addstr(vec[1], vec[0], str)
+        if vec == None:
+            y, x = self._pad.getyx()
         else:
-            self._pad.addstr(vec[1], vec[0], str, attr)
+            x, y = vec
+        
+        # truncate strings that go out of bounds
+        space = self.width * self.height - (y * self.width) + x
+        if len(string) > space:
+            string = string[:space]
+            
+        
+        # once again that rediculus workaround for the "quirk"
+        try:
+            self._pad.addstr(y, x, string, attr)
+        except curses.error as e:
+            if "returned ERR" in str(e): # Common message for the quirk
+                pass
+            else:
+                raise
         
     def draw(self):
         if self.bd:
