@@ -1,7 +1,7 @@
 import curses
 import time
 from datetime import timedelta
-
+from clockin.core.keys import Keys
 
 class Pad_defalts:
     def __init__(self):
@@ -102,11 +102,49 @@ class List_menu(Pad):
         self.items = items
         self.selected = None
         
-    def update(self):
+        self.active = False
+        
+        self.key = Keys(self._pad)
+        
+    def update(self, keys: Keys):
+        if self.active:
+            key = keys.usekey()
+            if self.selected == None:
+                self.selected = 0
+                
+            if key == "KEY_UP":
+                self.prev()
+            elif key == "KEY_DOWN":
+                self.next()
+            elif self.key == "KEY_ENTER":
+                pass
+        
+            
+        
         self._pad.clear()
-        for item in self.items:
-            self.addstr(f"{item}\n")
+        for i in range(len(self.items)):
+            if i == self.selected:
+                self.addstr(f"{self.items[i]}\n", (0, i), curses.A_UNDERLINE)
+            else:
+                self.addstr(f"{self.items[i]}\n")
+        self.addstr(f"{self.key.last}\n")
         self.draw()
+        
+    def next(self):
+        self.selected += 1
+        if self.selected >= len(self.items):
+            self.selected = 0
+    
+    def prev(self):
+        self.selected -= 1
+        if self.selected < 0:
+            self.selected = len(self.items) - 1
+        
+    def activate(self):
+        self.active = True
+        
+    def deactivate(self):
+        self.active = False
     
     
 class Timer(Pad):

@@ -5,11 +5,12 @@ class Keys:
         self.window = window
         self.last = ""
         
+        self.window.keypad(True)
         self.window.nodelay(True)
         
     def update(self):
         try:
-            self.last = self.window.getkey()
+            self.last = str(self.window.getkey())
         except:
             pass
         

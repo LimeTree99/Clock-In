@@ -38,6 +38,7 @@ def app(stdscr):
     log.addstr(f" <{log._pad.getyx()}> ", (0,0))
     
     timer.start()
+    tasks_menu.activate()
     
     
     delay = Delay()
@@ -45,8 +46,10 @@ def app(stdscr):
     while not end:
         
         #update
-        tasks_menu.update()
         keys.update()
+        
+        tasks_menu.update(keys)
+        
         
         log.addstr(keys.usekey(), (0,0))
         
