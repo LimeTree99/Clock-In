@@ -83,12 +83,12 @@ class Pad(Pad_defalts):
         
     def draw(self):
         if self.bd:
-            self._bd_pad.refresh(0,0, 
+            self._bd_pad.noutrefresh(0,0, 
                                  self.vec[1] - 1, 
                                  self.vec[0] - 1, 
                                  self.vec[1] + self.height + 1, 
                                  self.vec[0] + self.width + 1)
-        self._pad.refresh(0,0, 
+        self._pad.noutrefresh(0,0, 
                           self.vec[1], 
                           self.vec[0], 
                           self.vec[1] + self.height, 
@@ -97,8 +97,8 @@ class Pad(Pad_defalts):
     
     
 class List_menu(Pad):
-    def __init__(self, width: int,  height: int, vec, items: list):
-        super().__init__(width, height, vec)
+    def __init__(self, width: int,  height: int, vec, items: list, **kargs: dict):
+        super().__init__(width, height, vec, **kargs)
         self.items = items
         self.selected = None
         
@@ -148,8 +148,8 @@ class List_menu(Pad):
     
     
 class Timer(Pad):
-    def __init__(self, width: int, height: int, vec):
-        super().__init__(width, height, vec)
+    def __init__(self, width: int, height: int, vec, **kargs: dict):
+        super().__init__(width, height, vec, **kargs)
         self.task = None
         self.active = False
         self.timestart = None
