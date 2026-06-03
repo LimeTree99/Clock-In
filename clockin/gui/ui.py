@@ -6,6 +6,7 @@ from clockin.core.keys import Keys
 class Pad_defalts:
     def __init__(self):
         self.bd = False
+        self.title = None
 
 
 
@@ -19,27 +20,28 @@ class Pad(Pad_defalts):
         self.__dict__ = self.__dict__ | kargs
         
         self._pad = curses.newpad(self.height, self.width)
-        self._buff = ""
-        if self.bd:
-            # lower right corner "quirk"              \/  sould be 2
-            self._bd_pad = curses.newpad(self.height + 2, self.width + 2) 
-            self._create_bd()
+        
+        self._bd_pad = curses.newpad(self.height + 2, self.width + 2) 
+        self._create_bd()
             
     def _create_bd(self):
-        self._bd_pad.addstr("┌" + "─" * self.width + "┐")
-        for i in range(self.height):
-            self._bd_pad.addch(i+1, 0, "│")
-            self._bd_pad.addch(i+1, self.width+1, "│")
-        self._bd_pad.addstr(self.height + 1, 0, "└" + "─" * self.width)
-        
-        # rediculus workaround to the lower right corner "quirk"
-        try:
-            self._bd_pad.addch("┘")
-        except curses.error as e:
-            if "returned ERR" in str(e): # Common message for the quirk
-                pass
-            else:
-                raise
+        if self.bd:
+            self._bd_pad.addstr("┌" + "─" * self.width + "┐")
+            for i in range(self.height):
+                self._bd_pad.addch(i+1, 0, "│")
+                self._bd_pad.addch(i+1, self.width+1, "│")
+            self._bd_pad.addstr(self.height + 1, 0, "└" + "─" * self.width)
+            
+            # rediculus workaround to the lower right corner "quirk"
+            try:
+                self._bd_pad.addch("┘")
+            except curses.error as e:
+                if "returned ERR" in str(e): # Common message for the quirk
+                    pass
+                else:
+                    raise
+        if self.title != None:
+            self._bd_pad.addstr(0, 1, self.title)
         
         
     def attron(self, attr: int):
@@ -82,7 +84,7 @@ class Pad(Pad_defalts):
                 raise
         
     def draw(self):
-        if self.bd:
+        if self.bd or self.title != None:
             self._bd_pad.noutrefresh(0,0, 
                                  self.vec[1] - 1, 
                                  self.vec[0] - 1, 

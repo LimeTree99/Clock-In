@@ -1,17 +1,11 @@
-import time
 import curses
 from curses import wrapper
 
 from clockin.gui.ui import List_menu, Timer, Pad
 from clockin.core.util import Delay
 from clockin.core.keys import Keys
+from clockin.core.task import Tasks
 
-
-
-class Task:
-    def __init__(self, name: str):
-        self.name = name
-        
 
 def app(stdscr):
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -22,16 +16,20 @@ def app(stdscr):
     COLOR_BLUE = curses.color_pair(3)
     curses.curs_set(0)
     
+    tasks = Tasks()
+    
     keys = Keys(stdscr)
     
     logo = Pad(8, 1, [1,1], bd=True)
     logo.addstr("Clock In")
     
-    
-    #init
-    timer = Timer(50, 1, [20, 1])
-    tasks_menu = List_menu(18, 12, [1, 4], ["T1", "task 2", "other thing 3"], bd=True)
-    log = Pad(50, 5, (1, 18), bd=True)
+    timer = Timer(50, 1, [11, 1], bd=True)
+    tasks_menu = List_menu(25, 17, 
+                           [1, 4], 
+                           ["T1", "task 2", "other thing 3"], 
+                           title="Tasks", 
+                           bd=True)
+    log = Pad(50, 5, (1, 23), title="Log", bd=True)
     
     log.addstr("?"*(6*50))
     log.addstr(f" <{log._pad.getyx()}> ", (0,0))
@@ -46,9 +44,7 @@ def app(stdscr):
         
         #update
         keys.update()
-        
         tasks_menu.update(keys)
-        
         
         #log.addstr(keys.usekey(), (0,0))
         
