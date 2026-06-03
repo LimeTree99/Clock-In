@@ -2,6 +2,7 @@ import curses
 import time
 from datetime import timedelta
 from clockin.core.keys import Keys
+from clockin.core.task import Tasks
 
 class Pad_defalts:
     def __init__(self):
@@ -99,9 +100,16 @@ class Pad(Pad_defalts):
     
     
 class List_menu(Pad):
-    def __init__(self, width: int,  height: int, vec, items: list, **kargs: dict):
+    def __init__(self, 
+                 width: int,  
+                 height: int, 
+                 vec, options: 
+                 list, funcs: list, 
+                 **kargs: dict):
+        
         super().__init__(width, height, vec, **kargs)
-        self.items = items
+        self.options = options
+        self.funcs = funcs
         self.selected = None
         
         self.active = False
@@ -114,41 +122,62 @@ class List_menu(Pad):
             if self.selected == None:
                 self.selected = 0
                 
-            if key == "KEY_UP":
+            if key == curses.KEY_UP:
                 self.prev()
-            elif key == "KEY_DOWN":
+            elif key == curses.KEY_DOWN:
                 self.next()
-            elif self.key == "KEY_ENTER":
+            elif key == Keys.KEY_ENTER or key == Keys.KEY_PADENTER or key == curses.KEY_ENTER:
+                # the above elif hopefully check enter for most systems
+                self.press()
+            elif key == -1:
+                pass
+            else:
                 pass
         
             
         
         self._pad.clear()
-        for i in range(len(self.items)):
+        for i in range(len(self.options)):
             if i == self.selected:
-                self.addstr(f"{self.items[i]}\n", (0, i), curses.A_UNDERLINE)
+                self.addstr(f"{self.options[i]}\n", (0, i), curses.A_UNDERLINE)
             else:
-                self.addstr(f"{self.items[i]}\n")
-        self.addstr(f"{self.key.last}\n")
+                self.addstr(f"{self.options[i]}\n")
+        
         self.draw()
         
     def next(self):
         self.selected += 1
-        if self.selected >= len(self.items):
+        if self.selected >= len(self.options):
             self.selected = 0
     
     def prev(self):
         self.selected -= 1
         if self.selected < 0:
-            self.selected = len(self.items) - 1
+            self.selected = len(self.options) - 1
         
     def activate(self):
         self.active = True
         
     def deactivate(self):
         self.active = False
-    
-    
+        
+    def press(self):
+        "Run the function associated with the selected option"
+        self.funcs[self.selected]()
+
+class Task_menu(List_menu):
+    def __init__(self, 
+                 width: int,  
+                 height: int, 
+                 tasks: Tasks,
+                 vec, options: 
+                 list, funcs: list, 
+                 **kargs: dict):
+        super().__init__(width, height, vec, options, funcs, **kargs)
+        self.tasks = tasks
+        
+
+
 class Timer(Pad):
     def __init__(self, width: int, height: int, vec, **kargs: dict):
         super().__init__(width, height, vec, **kargs)

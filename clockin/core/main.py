@@ -1,7 +1,7 @@
 import curses
 from curses import wrapper
 
-from clockin.gui.ui import List_menu, Timer, Pad
+from clockin.gui.ui import List_menu, Timer, Pad, Task_menu
 from clockin.core.util import Delay
 from clockin.core.keys import Keys
 from clockin.core.task import Tasks
@@ -20,13 +20,17 @@ def app(stdscr):
     
     keys = Keys(stdscr)
     
+    
     logo = Pad(8, 1, [1,1], bd=True)
     logo.addstr("Clock In")
     
     timer = Timer(50, 1, [11, 1], bd=True)
-    tasks_menu = List_menu(25, 17, 
-                           [1, 4], 
-                           ["T1", "task 2", "other thing 3"], 
+    tasks_menu = Task_menu(width=25, 
+                           height=17, 
+                           vec=[1, 4], 
+                           tasks=tasks,
+                           options=["T1", "task 2", "other thing 3"], 
+                           funcs=[lambda: 1+1, lambda: 1+1, lambda: logo.addstr("Clock-In", [0,0])],
                            title="Tasks", 
                            bd=True)
     log = Pad(50, 5, (1, 23), title="Log", bd=True)
