@@ -103,14 +103,17 @@ class List_menu(Pad):
     def __init__(self, 
                  width: int,  
                  height: int, 
-                 vec, options: 
-                 list, funcs: list, 
+                 vec: tuple[int, int], 
+                 options: list, 
+                 funcs: list, 
                  **kargs: dict):
         
+        self.mask_options = []
         super().__init__(width, height, vec, **kargs)
         self.options = options
         self.funcs = funcs
         self.selected = None
+        
         
         self.active = False
         
@@ -127,7 +130,7 @@ class List_menu(Pad):
             elif key == curses.KEY_DOWN:
                 self.next()
             elif key == Keys.KEY_ENTER or key == Keys.KEY_PADENTER or key == curses.KEY_ENTER:
-                # the above elif hopefully check enter for most systems
+                # the above elif hopefully checks for enter on most systems
                 self.press()
             elif key == -1:
                 pass
@@ -147,11 +150,23 @@ class List_menu(Pad):
         
     def next(self):
         self.selected += 1
+        
+        while self.selected in self.mask_options:
+            self.selected += 1
+            if self.selected >= len(self.options):
+                self.selected = 0
+        
+        
         if self.selected >= len(self.options):
             self.selected = 0
     
     def prev(self):
         self.selected -= 1
+        while self.selected in self.mask_options:
+            self.selected -= 1
+            if self.selected < 0:
+                self.selected = len(self.options) - 1
+        
         if self.selected < 0:
             self.selected = len(self.options) - 1
         
@@ -170,24 +185,39 @@ class Task_menu(List_menu):
                  width: int,  
                  height: int, 
                  tasks: Tasks,
-                 vec, options: 
-                 list, funcs: list, 
+                 vec: tuple[int, int],
                  **kargs: dict):
-        super().__init__(width, height, vec, options, funcs, **kargs)
         self.tasks = tasks
+        funcs = [lambda name=name: self.select_task(name) for name in self.tasks.get_names()]
+        
+        funcs = funcs + [lambda: "hold", self.add_task, self.delete_task]
+        super().__init__(width, height, vec, 
+                         options=self.tasks.get_names() + ["", "Add Task", "Delete Task"], 
+                         funcs=funcs, **kargs)
+        
+        self.mask_options = [len(self.options) - 3]
+        
+    def add_task(self):
+        pass
+    
+    def delete_task(self):
+        pass
+        
+        
+    def select_task(self, name):
+        self.tasks.set_selected(name)
+        
         
 
 
 class Timer(Pad):
-    def __init__(self, width: int, height: int, vec, **kargs: dict):
+    def __init__(self, width: int, height: int, vec, tasks: Tasks, **kargs: dict):
         super().__init__(width, height, vec, **kargs)
+        self.tasks = tasks
         self.task = None
         self.active = False
         self.timestart = None
-        
-    def settask(self, task):
-        self.task = task
-        
+                
     def start(self):
         self.timestart = time.time()
         
@@ -208,10 +238,10 @@ class Timer(Pad):
     
     def draw(self):
         self._pad.clear()
-        if self.task == None:
+        if self.tasks.get_selected() == None:
             task = "Select a task"
         else: 
-            task = self.task
+            task = self.tasks.get_selected().name
             
         self.addstr(f"{task} | {self.gettime()}")
         return super().draw()

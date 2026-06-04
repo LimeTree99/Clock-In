@@ -17,6 +17,11 @@ def app(stdscr):
     curses.curs_set(0)
     
     tasks = Tasks()
+    tasks.add("first")
+    tasks.add("second")
+    tasks.add("t3")
+    tasks.add("t4")
+    tasks.add("t5")
     
     keys = Keys(stdscr)
     
@@ -24,19 +29,16 @@ def app(stdscr):
     logo = Pad(8, 1, [1,1], bd=True)
     logo.addstr("Clock In")
     
-    timer = Timer(50, 1, [11, 1], bd=True)
+    timer = Timer(50, 1, [11, 1], tasks, bd=True)
     tasks_menu = Task_menu(width=25, 
                            height=17, 
                            vec=[1, 4], 
                            tasks=tasks,
-                           options=["T1", "task 2", "other thing 3"], 
-                           funcs=[lambda: 1+1, lambda: 1+1, lambda: logo.addstr("Clock-In", [0,0])],
                            title="Tasks", 
                            bd=True)
     log = Pad(50, 5, (1, 23), title="Log", bd=True)
     
     log.addstr("?"*(6*50))
-    log.addstr(f" <{log._pad.getyx()}> ", (0,0))
     
     timer.start()
     tasks_menu.activate()

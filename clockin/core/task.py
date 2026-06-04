@@ -20,9 +20,33 @@ class Tasks:
     """
     def __init__(self, tasks: list=[]):
         self.tasks = tasks
+        self.selected = None
         
     def add(self, task_name: str):
         self.tasks.append(Task(task_name))
+        
+    def get_names(self):
+        names = []
+        for task in self.tasks:
+            names.append(task.name)
+        return names
+        
+    def set_selected(self, name) -> bool:
+        found = False
+        self.selected = 0
+        while not found and self.selected < len(self.tasks):
+            if name == self.tasks[self.selected].name:
+                found = True
+            else:
+                self.selected += 1
+                
+        return found            
+        
+    def get_selected(self):
+        if self.selected == None:
+            return None
+        else:
+            return self.tasks[self.selected]
         
     def load_file(self, filename: str):
         pass
