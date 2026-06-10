@@ -3,6 +3,7 @@ import time
 from datetime import timedelta
 from clockin.core.keys import Keys
 from clockin.core.task import Tasks
+from clockin.core.util import Event_loop
 
 class Pad_defalts:
     def __init__(self):
@@ -121,17 +122,20 @@ class List_menu(Pad):
         
     def update(self, keys: Keys):
         if self.active:
-            key = keys.usekey()
+            key = keys.checkkey()
             if self.selected == None:
                 self.selected = 0
                 
             if key == curses.KEY_UP:
                 self.prev()
+                keys.usekey()
             elif key == curses.KEY_DOWN:
                 self.next()
+                keys.usekey()
             elif key == Keys.KEY_ENTER or key == Keys.KEY_PADENTER or key == curses.KEY_ENTER:
                 # the above elif hopefully checks for enter on most systems
                 self.press()
+                keys.usekey()
             elif key == -1:
                 pass
             else:
@@ -217,6 +221,9 @@ class Timer(Pad):
         self.task = None
         self.active = False
         self.timestart = None
+        self.attr = curses.A_STANDOUT
+        
+        self.events = Event_loop()
                 
     def start(self):
         self.timestart = time.time()
@@ -224,13 +231,15 @@ class Timer(Pad):
     def stop(self):
         pass
     
-    def update(self):
-        pass
+    def update(self, keys: Keys):
+        if keys.checkkey() == Keys.KEY_SPACE:
+            keys.usekey()
+            self.start()
     
     def gettime(self):
         timestr = ""
         if self.timestart == None:
-            timestr = "00:00"
+            timestr = "0:00:00"
         else:
             timestr = str(timedelta(seconds=int(time.time()-self.timestart)))
         
@@ -243,5 +252,5 @@ class Timer(Pad):
         else: 
             task = self.tasks.get_selected().name
             
-        self.addstr(f"{task} | {self.gettime()}")
+        self.addstr(f"{task} | {self.gettime()}", attr=self.attr)
         return super().draw()

@@ -40,7 +40,6 @@ def app(stdscr):
     
     log.addstr("?"*(6*50))
     
-    timer.start()
     tasks_menu.activate()
     
     
@@ -51,6 +50,7 @@ def app(stdscr):
         #update
         keys.update()
         tasks_menu.update(keys)
+        timer.update(keys)
         
         #log.addstr(keys.usekey(), (0,0))
         
