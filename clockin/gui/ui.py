@@ -221,7 +221,8 @@ class Timer(Pad):
         self.task = None
         self.active = False
         self.timestart = None
-        self.attr = curses.A_STANDOUT
+        self.timeend = None
+        self.attr = curses.A_NORMAL
         
         self.events = Event_loop()
                 
@@ -235,6 +236,13 @@ class Timer(Pad):
         if keys.checkkey() == Keys.KEY_SPACE:
             keys.usekey()
             self.start()
+            self.attr = curses.A_STANDOUT
+            self.events.new(func=lambda: self.set_attr(curses.A_NORMAL), delay=1, repeat=1)
+            
+        self.events.run()
+        
+    def set_attr(self, attr):
+        self.attr = attr
     
     def gettime(self):
         timestr = ""

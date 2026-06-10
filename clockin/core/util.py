@@ -39,7 +39,7 @@ class Event_loop:
         True if succesfull false if not found
         """
     
-    def event_loop(self):
+    def run(self):
         i = 0
         while i < len(self.events):
             event = self.events[i]
@@ -47,12 +47,13 @@ class Event_loop:
                 event.func()
                 event.last_run = time.time()
                 event.run_immediate = False
-            elif event.last_run + event.delay > time.time():
+            elif event.last_run + event.delay < time.time():
                 event.func()
                 event.last_run = time.time()
                 event.repeat -= 1
                 if event.repeat <= 0:
                     self.events.pop(i)
+            i += 1
                     
     class Event:
         def __init__(self, func, delay: float, repeat: float, run_immediate: bool):
