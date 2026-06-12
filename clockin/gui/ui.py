@@ -32,10 +32,11 @@ class Pad(Pad_defalts):
         
         self._pad = curses.newpad(self.height, self.width)
         
-        self._bd_pad = curses.newpad(self.height + 2, self.width + 2) 
+        self._bd_pad = curses.newpad(self.height + 2, self.width + 2)
         self._create_bd()
             
     def _create_bd(self):
+        
         if self.bd:
             self._bd_pad.addstr("┌" + "─" * self.width + "┐")
             for i in range(self.height):
@@ -63,6 +64,14 @@ class Pad(Pad_defalts):
         
     def clear(self):
         self._pad.clear()
+        
+    def resize(self, width, height, vec):
+        self.width = max(width, 0)
+        self.height = max(height, 0)
+        self.vec = vec
+        self._pad = curses.newpad(self.height, self.width)
+        self._bd_pad = curses.newpad(self.height + 2, self.width + 2)
+        self._create_bd()
         
     def addstr(self, string: str, vec: tuple[int, int]=None, attr: int=curses.A_NORMAL):
         """
@@ -98,17 +107,18 @@ class Pad(Pad_defalts):
                 raise
         
     def draw(self):
-        if self.bd or self.title != None:
-            self._bd_pad.noutrefresh(0,0, 
-                                 self.vec[1] - 1, 
-                                 self.vec[0] - 1, 
-                                 self.vec[1] + self.height + 1, 
-                                 self.vec[0] + self.width + 1)
-        self._pad.noutrefresh(0,0, 
-                          self.vec[1], 
-                          self.vec[0], 
-                          self.vec[1] + self.height, 
-                          self.vec[0] + self.width)
+        if self.width > 0 and self.height > 0:
+            if self.bd or self.title != None:
+                self._bd_pad.noutrefresh(0,0, 
+                                    self.vec[1] - 1, 
+                                    self.vec[0] - 1, 
+                                    self.vec[1] + self.height + 1, 
+                                    self.vec[0] + self.width + 1)
+            self._pad.noutrefresh(0,0, 
+                            self.vec[1], 
+                            self.vec[0], 
+                            self.vec[1] + self.height, 
+                            self.vec[0] + self.width)
         
 class Log(Pad):
     "a Pad that you can add to continuously"
@@ -135,6 +145,11 @@ class Log(Pad):
             
             # remember to truncate final line
             n -= 1
+            
+    def resize(self, width, height, vec):
+        re = super().resize(width, height, vec)
+        self.render()
+        return re
         
     
 class List_menu(Pad):
@@ -180,7 +195,7 @@ class List_menu(Pad):
         self._pad.clear()
         for i in range(len(self.options)):
             if i == self.selected:
-                self.addstr(f"{self.options[i]}\n", (0, i), curses.A_UNDERLINE)
+                self.addstr(f"{self.options[i]}\n", attr=curses.A_UNDERLINE)
             else:
                 self.addstr(f"{self.options[i]}\n")
         

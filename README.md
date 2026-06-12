@@ -23,11 +23,12 @@ Contribute by forking the repo and open a pull request.
 
 <!--
 # Todo
-- make resizeable
 - events:
     - save and load to .csv
     
 # Bugs
-- if list menu option is wraped onto multiple lines it "wiggles" up and down when selected
+- visual bug when rezied a bunch
+    - I think it's an underlying curses issue
+    - not easily repeatable, needs investigation
 
 -->
