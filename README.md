@@ -20,3 +20,14 @@ Contribute by forking the repo and open a pull request.
 - start and stop the clock on tasks
 - view statistics about the time spent doing different tasks
 -->
+
+<!--
+# Todo
+- make resizeable
+- events:
+    - save and load to .csv
+    
+# Bugs
+- if list menu option is wraped onto multiple lines it "wiggles" up and down when selected
+
+-->

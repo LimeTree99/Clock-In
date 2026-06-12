@@ -12,6 +12,12 @@ class Pad_defalts:
     def __init__(self):
         self.bd = False
         self.title = None
+        
+    def draw(self):
+        pass
+    
+    def render(self):
+        pass
 
 
 
@@ -54,6 +60,9 @@ class Pad(Pad_defalts):
         
     def attroff(self, attr: int):
         self._pad.attroff(attr)
+        
+    def clear(self):
+        self._pad.clear()
         
     def addstr(self, string: str, vec: tuple[int, int]=None, attr: int=curses.A_NORMAL):
         """
@@ -101,7 +110,32 @@ class Pad(Pad_defalts):
                           self.vec[1] + self.height, 
                           self.vec[0] + self.width)
         
-    
+class Log(Pad):
+    "a Pad that you can add to continuously"
+    def __init__(self, 
+                 width: int,  
+                 height: int, 
+                 vec: tuple[int, int], 
+                 **kargs: dict):
+        super().__init__(width, height, vec, **kargs)   
+        self._logs = [] 
+        
+    def log(self, string: str):
+        self._logs.append(string)
+        self.render()
+        
+    def render(self):
+        self.clear()
+        n = len(self._logs) - 1
+        line = 0
+        while n >= 0 and line < self.height:
+            self.addstr(self._logs[n], [0,line])
+            
+            line += len(self._logs[n]) // self.width + 1
+            
+            # remember to truncate final line
+            n -= 1
+        
     
 class List_menu(Pad):
     def __init__(self, 
@@ -117,7 +151,6 @@ class List_menu(Pad):
         self.options = options
         self.funcs = funcs
         self.selected = None
-        
         
         self.active = False
         
@@ -143,8 +176,6 @@ class List_menu(Pad):
                 pass
             else:
                 pass
-        
-            
         
         self._pad.clear()
         for i in range(len(self.options)):
@@ -187,6 +218,7 @@ class List_menu(Pad):
         "Run the function associated with the selected option"
         self.funcs[self.selected]()
 
+
 class Task_menu(List_menu):
     def __init__(self, 
                  width: int,  
@@ -210,11 +242,8 @@ class Task_menu(List_menu):
     def delete_task(self):
         pass
         
-        
     def select_task(self, name):
         self.tasks.set_selected(name)
-        
-        
 
 
 class Timer(Pad):

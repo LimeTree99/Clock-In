@@ -1,6 +1,6 @@
 
 class Event:
-    def __init__(self, start):
+    def __init__(self, start: float):
         self.start = start
         self.end = None 
         
@@ -10,8 +10,11 @@ class Task:
         self.name = name
         self.events = []
         
-    def add_event(self, event):
-        self.event.append(event)
+    def start(self, time: float):
+        self.events.append(Event(time))
+        
+    def end(self, time: float):
+        self.events[-1].end = time
 
 
 class Tasks:

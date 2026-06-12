@@ -1,7 +1,7 @@
 import curses
 from curses import wrapper
 
-from clockin.gui.ui import List_menu, Timer, Pad, Task_menu
+from clockin.gui.ui import List_menu, Timer, Pad, Task_menu, Log
 from clockin.core.util import Delay
 from clockin.core.keys import Keys
 from clockin.core.task import Tasks
@@ -33,9 +33,18 @@ def app(stdscr):
                            tasks=tasks,
                            title="Tasks", 
                            bd=True)
-    log = Pad(50, 5, (1, 23), title="Log", bd=True)
+    log = Log(25, 17, (28, 4), title="Log", bd=True)
     
-    log.addstr("?"*(6*50))
+    log.log(">"+"0"*30)
+    log.log(">"+"1"*30)
+    log.log(">"+"2"*30)
+    log.log(">"+"3"*30)
+    log.log(">"+"4"*30)
+    log.log(">"+"5"*30)
+    log.log(">"+"6"*30)
+    log.log(">"+"7"*30)
+    log.log(">"+"8"*30)
+    log.log(">"+"9"*30)
     
     tasks_menu.activate()
     
@@ -43,14 +52,11 @@ def app(stdscr):
     delay = Delay()
     end = False
     while not end:
-        
         #update
         keys.update()
         tasks_menu.update(keys)
         timer.update(keys)
-        
-        #log.addstr(keys.usekey(), (0,0))
-        
+                
         #draw
         tasks_menu.draw()
         timer.draw()
