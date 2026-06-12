@@ -42,7 +42,7 @@ class Tasks:
                 
         return found            
         
-    def get_selected(self):
+    def get_selected(self) -> None | Task:
         if self.selected == None:
             return None
         else:

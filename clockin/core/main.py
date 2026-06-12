@@ -6,15 +6,12 @@ from clockin.core.util import Delay
 from clockin.core.keys import Keys
 from clockin.core.task import Tasks
 
+from clockin.gui import Color
+
 
 def app(stdscr):
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    COLOR_GREEN = curses.color_pair(1)
-    COLOR_RED = curses.color_pair(2)
-    COLOR_BLUE = curses.color_pair(3)
     curses.curs_set(0)
+    Color.init()
     
     tasks = Tasks()
     tasks.add("first")

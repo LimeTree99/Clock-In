@@ -1,9 +1,12 @@
 import curses
 import time
 from datetime import timedelta
+
 from clockin.core.keys import Keys
 from clockin.core.task import Tasks
 from clockin.core.util import Event_loop
+
+from clockin.gui import Color
 
 class Pad_defalts:
     def __init__(self):
@@ -218,28 +221,37 @@ class Timer(Pad):
     def __init__(self, width: int, height: int, vec, tasks: Tasks, **kargs: dict):
         super().__init__(width, height, vec, **kargs)
         self.tasks = tasks
-        self.task = None
         self.active = False
         self.timestart = None
         self.timeend = None
+        self.timing = False
         self.attr = curses.A_NORMAL
         
         self.events = Event_loop()
                 
     def start(self):
         self.timestart = time.time()
+        self.flash(Color.GREEN, 0.5)
+        self.timing = True
         
     def stop(self):
-        pass
+        self.timeend = time.time()
+        self.flash(Color.RED, 0.5)
+        self.timing = False
     
     def update(self, keys: Keys):
-        if keys.checkkey() == Keys.KEY_SPACE:
+        if keys.checkkey() == Keys.KEY_SPACE and self.tasks.get_selected() != None:
             keys.usekey()
-            self.start()
-            self.attr = curses.A_STANDOUT
-            self.events.new(func=lambda: self.set_attr(curses.A_NORMAL), delay=1, repeat=1)
-            
+            if self.timing:
+                self.stop()
+            else:
+                self.start()
+                
         self.events.run()
+        
+    def flash(self, color, duration: float):
+        self.attr = color
+        self.events.new(func=lambda: self.set_attr(curses.A_NORMAL), delay=duration, repeat=1)
         
     def set_attr(self, attr):
         self.attr = attr
@@ -249,7 +261,11 @@ class Timer(Pad):
         if self.timestart == None:
             timestr = "0:00:00"
         else:
-            timestr = str(timedelta(seconds=int(time.time()-self.timestart)))
+            if self.timing:
+                self.timeend = time.time()
+                timestr = str(timedelta(seconds=int(self.timeend - self.timestart)))
+            else:
+                timestr = str(timedelta(seconds=int(self.timeend - self.timestart)))
         
         return timestr
     
