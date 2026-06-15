@@ -18,6 +18,9 @@ class Pad_defalts:
     
     def render(self):
         pass
+    
+    def update(self, keys: Keys):
+        pass
 
 
 
@@ -165,7 +168,7 @@ class List_menu(Pad):
         super().__init__(width, height, vec, **kargs)
         self.options = options
         self.funcs = funcs
-        self.selected = None
+        self.selected = 0
         
         self.active = False
         
@@ -173,10 +176,7 @@ class List_menu(Pad):
         
     def update(self, keys: Keys):
         if self.active:
-            key = keys.checkkey()
-            if self.selected == None:
-                self.selected = 0
-                
+            key = keys.checkkey()                
             if key == curses.KEY_UP:
                 self.prev()
                 keys.usekey()
@@ -232,6 +232,82 @@ class List_menu(Pad):
     def press(self):
         "Run the function associated with the selected option"
         self.funcs[self.selected]()
+        
+class Textbox(Pad):
+    def __init__(self, 
+                 width: int,  
+                 height: int, 
+                 vec: tuple[int, int],
+                 **kargs: dict):
+        self.message = ''
+        super().__init__(width, height, vec, **kargs)
+        self.cursor_char = '|'
+        self.cursor = self.cursor_char
+        self.entry = ''
+        
+        self.events = Event_loop()
+        self.events.new(self.cursorflash, 0.5)
+        
+    def cursorflash(self):
+        if self.cursor == '':
+            self.cursor = self.cursor_char
+        else:
+            self.cursor = ''
+        
+    def update(self, keys):
+        if keys.checkkey() != -1:
+            key = keys.usekey()
+            if key == curses.KEY_BACKSPACE or key == Keys.KEY_BACKSPACE:
+                self.entry = self.entry[:-1]
+            elif key in [curses.KEY_ENTER, Keys.KEY_ENTER, Keys.KEY_PADENTER]:
+                self.entry += 'enter'
+            key = curses.keyname(key).decode("utf-8")
+            if len(key) == 1:
+                self.entry = self.entry + key
+            
+            
+        self.clear()
+        self.addstr(self.entry)
+        self.addstr(self.cursor)
+        self.addstr(self.message, [0, self.height-1])
+        self.events.run()
+            
+        
+        
+        
+class Popup_container:
+    def __init__(self, 
+                 width: int,  
+                 height: int, 
+                 vec: tuple[int, int],
+                 **kargs: dict):
+        self.width = width
+        self.height = height
+        self.vec = vec
+        self.kargs = kargs
+        
+        self._pad = None # of type clockin.gui.ui.Pad NOT curses.pad
+        
+    def set_pad(self, pad: Pad):
+        self._pad = pad
+        self._pad.resize(self.width, self.height, self.vec)
+        
+    def destroy(self):
+        self._pad = None        
+        
+    def draw(self):
+        if self._pad != None:
+            self._pad.draw()
+    
+    def update(self, keys:Keys):
+        if self._pad != None:
+            self._pad.update(keys)
+    
+    def resize(self, width: int, height: int, vec: tuple[int, int]):
+        self.width = max(width, 0)
+        self.height = max(height, 0)
+        self.vec = vec
+        self._pad.resize(width, height, vec)
 
 
 class Task_menu(List_menu):
@@ -240,6 +316,7 @@ class Task_menu(List_menu):
                  height: int, 
                  tasks: Tasks,
                  vec: tuple[int, int],
+                 popup: Popup_container,
                  **kargs: dict):
         self.tasks = tasks
         funcs = [lambda name=name: self.select_task(name) for name in self.tasks.get_names()]
@@ -248,11 +325,16 @@ class Task_menu(List_menu):
         super().__init__(width, height, vec, 
                          options=self.tasks.get_names() + ["", "Add Task", "Delete Task"], 
                          funcs=funcs, **kargs)
-        
+        self.popup = popup
         self.mask_options = [len(self.options) - 3]
         
     def add_task(self):
-        pass
+        self.deactivate()
+        self.popup.set_pad(Textbox(10,10,[10,10], 
+                                   bd=True, 
+                                   title="New Task Name", 
+                                   message="[ENTER]"))
+        
     
     def delete_task(self):
         pass

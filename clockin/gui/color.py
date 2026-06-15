@@ -13,3 +13,4 @@ class Color:
         Color.RED = curses.color_pair(2)
         Color.BLUE = curses.color_pair(3)
         
+        

@@ -4,6 +4,7 @@ class Keys:
     KEY_ENTER = 10
     KEY_PADENTER = 459
     KEY_SPACE = 32
+    KEY_BACKSPACE = 8
     def __init__(self, window):
         self.window = window
         self.last = -1
