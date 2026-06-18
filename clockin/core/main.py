@@ -73,6 +73,9 @@ def app(stdscr):
                               height=term_height-6, 
                               vec=[1, 4],)
             timer.resize((term_width//2)*2-13, 1, [11, 1])
+            popup.resize(width=min(20, term_width-3), 
+                         height=min(5, term_height-3), 
+                         vec=(term_width//2-20//2, term_height//2-5//2))
             
         for pad in update_list:
             pad.update(keys)        

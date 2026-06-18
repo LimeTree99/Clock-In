@@ -238,9 +238,11 @@ class Textbox(Pad):
                  width: int,  
                  height: int, 
                  vec: tuple[int, int],
+                 enter_func,
                  **kargs: dict):
         self.message = ''
         super().__init__(width, height, vec, **kargs)
+        self._enter_func = enter_func
         self.cursor_char = '|'
         self.cursor = self.cursor_char
         self.entry = ''
@@ -260,19 +262,16 @@ class Textbox(Pad):
             if key == curses.KEY_BACKSPACE or key == Keys.KEY_BACKSPACE:
                 self.entry = self.entry[:-1]
             elif key in [curses.KEY_ENTER, Keys.KEY_ENTER, Keys.KEY_PADENTER]:
-                self.entry += 'enter'
+                self._enter_func(self.entry)
             key = curses.keyname(key).decode("utf-8")
             if len(key) == 1:
                 self.entry = self.entry + key
-            
             
         self.clear()
         self.addstr(self.entry)
         self.addstr(self.cursor)
         self.addstr(self.message, [0, self.height-1])
         self.events.run()
-            
-        
         
         
 class Popup_container:
@@ -307,7 +306,8 @@ class Popup_container:
         self.width = max(width, 0)
         self.height = max(height, 0)
         self.vec = vec
-        self._pad.resize(width, height, vec)
+        if self._pad != None:
+            self._pad.resize(width, height, vec)
 
 
 class Task_menu(List_menu):
@@ -328,13 +328,29 @@ class Task_menu(List_menu):
         self.popup = popup
         self.mask_options = [len(self.options) - 3]
         
+    def recreate(self):
+        "recreate the list and asociated functions"
+        self.selected = 0
+        self.funcs = []
+        for name in self.tasks.get_names():
+            self.funcs.append(lambda name=name: self.select_task(name))
+        self.funcs = self.funcs + [lambda: "hold", self.add_task, self.delete_task]
+        self.options=self.tasks.get_names() + ["", "Add Task", "Delete Task"]
+        self.mask_options = [len(self.options) - 3]
+        
     def add_task(self):
         self.deactivate()
         self.popup.set_pad(Textbox(10,10,[10,10], 
                                    bd=True, 
+                                   enter_func=self.add_task_output,
                                    title="New Task Name", 
                                    message="[ENTER]"))
-        
+    
+    def add_task_output(self, text):
+        self.tasks.add(text)   
+        self.popup.destroy()
+        self.recreate()
+        self.activate()
     
     def delete_task(self):
         pass
