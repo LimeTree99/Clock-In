@@ -28,6 +28,17 @@ class Tasks:
     def add(self, task_name: str):
         self.tasks.append(Task(task_name))
         
+    def pop(self, task_name: str) -> Task:
+        task = None
+        n = 0
+        while task == None and n < len(self.tasks):
+            if task_name == self.tasks[n].name:
+                task = self.tasks.pop(n)
+            else:
+                n += 1
+                
+        return task
+        
     def get_names(self):
         names = []
         for task in self.tasks:

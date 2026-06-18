@@ -162,15 +162,21 @@ class List_menu(Pad):
                  vec: tuple[int, int], 
                  options: list, 
                  funcs: list, 
+                 start_active: bool=False,
+                 mask_options: list=[],
                  **kargs: dict):
         
-        self.mask_options = []
+        self.mask_options = mask_options
         super().__init__(width, height, vec, **kargs)
         self.options = options
         self.funcs = funcs
-        self.selected = 0
         
-        self.active = False
+        self.selected = 0
+        if self.selected in self.mask_options:
+            self.next()
+        
+        
+        self.active = start_active
         
         self.key = Keys(self._pad)
         
@@ -348,12 +354,45 @@ class Task_menu(List_menu):
     
     def add_task_output(self, text):
         self.tasks.add(text)   
+        self.exit_popup()
+        
+    def exit_popup(self):
         self.popup.destroy()
         self.recreate()
         self.activate()
     
     def delete_task(self):
-        pass
+        def check(name):
+            def delete_this_task(name):
+                self.tasks.pop(name)
+                self.exit_popup()
+            
+            self.popup.destroy()
+            options = [f"Delete [{name}]\nPermanently?",'',"No","Yes"]
+            funcs=['','',self.exit_popup, lambda name=name: delete_this_task(name)]
+            menu = List_menu(10,10,[10,10],
+                             options=options,
+                             funcs=funcs,
+                             start_active=True,
+                             mask_options=[0,1],
+                             bd=True,
+                             title=f"Delete")
+            menu.attron(Color.RED)
+            
+            self.popup.set_pad(menu)
+            
+        
+            
+        self.deactivate()
+        funcs = []
+        for name in self.tasks.get_names():
+            funcs.append(lambda name=name: check(name))
+        self.popup.set_pad(List_menu(10,10,[10,10],
+                                     options=self.tasks.get_names(),
+                                     funcs=funcs,
+                                     start_active=True,
+                                     bd=True,
+                                     title="Delete Task"))
         
     def select_task(self, name):
         self.tasks.set_selected(name)
