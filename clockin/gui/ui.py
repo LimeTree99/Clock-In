@@ -201,33 +201,32 @@ class List_menu(Pad):
         self._pad.clear()
         for i in range(len(self.options)):
             if i == self.selected:
-                self.addstr(f"{self.options[i]}\n", attr=curses.A_UNDERLINE)
+                self.addstr(f"{self.options[i]}", attr=curses.A_UNDERLINE)
             else:
-                self.addstr(f"{self.options[i]}\n")
+                self.addstr(f"{self.options[i]}")
+            self.addstr(" \n")
         
         self.draw()
         
     def next(self):
         self.selected += 1
+        if self.selected >= len(self.options):
+            self.selected = 0
         
         while self.selected in self.mask_options:
             self.selected += 1
             if self.selected >= len(self.options):
                 self.selected = 0
         
-        
-        if self.selected >= len(self.options):
-            self.selected = 0
-    
     def prev(self):
         self.selected -= 1
+        if self.selected < 0:
+            self.selected = len(self.options) - 1
+            
         while self.selected in self.mask_options:
             self.selected -= 1
             if self.selected < 0:
                 self.selected = len(self.options) - 1
-        
-        if self.selected < 0:
-            self.selected = len(self.options) - 1
         
     def activate(self):
         self.active = True
@@ -376,21 +375,20 @@ class Task_menu(List_menu):
                              start_active=True,
                              mask_options=[0,1],
                              bd=True,
-                             title=f"Delete")
+                             title=f"Delete Task")
             menu.attron(Color.RED)
-            
             self.popup.set_pad(menu)
             
         
-            
         self.deactivate()
-        funcs = []
+        funcs = [self.exit_popup,'']
         for name in self.tasks.get_names():
             funcs.append(lambda name=name: check(name))
         self.popup.set_pad(List_menu(10,10,[10,10],
-                                     options=self.tasks.get_names(),
+                                     options=["[Exit]",'',]+self.tasks.get_names(),
                                      funcs=funcs,
                                      start_active=True,
+                                     mask_options=[1],
                                      bd=True,
                                      title="Delete Task"))
         

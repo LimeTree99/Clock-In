@@ -25,15 +25,8 @@ Contribute by forking the repo and open a pull request.
 # Todo
 - events:
     - save and load to .csv
-- user can add tasks
-    - popup in middle of screen with textbox
-    - ability to make and destroy pads dynamicly
-- user can delete tasks
-- catch Ctrl+C and quit the program a little nicer
     
 # Bugs
-- visual bug when rezied a bunch
-    - I think it's an underlying curses issue
-    - not easily repeatable, needs investigation
+- when resized small the mask on the Menu popup stops masking options
 
 -->
