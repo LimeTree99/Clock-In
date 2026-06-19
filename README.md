@@ -1,17 +1,20 @@
 # Clock-In
 A time keeping teminal application. Great for anyone wanting to keep track of how much time they spend on different tasks.
 
-# Contributing
-Contribute by forking the repo and open a pull request.
+# Dependencies
+Python and the `curses` module
 
+# Quick Start
+Clone or download the repository and run `clockin.py`
+<!-- -->
 
+# Getting Started
+Navigate with the arrow keys and enter. Create a new task and start the timer with the spacebar. 
 
 
 
 <!--
 # Motivation
-
-# Quick Start
 
 # Usage
 
