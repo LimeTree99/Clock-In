@@ -27,6 +27,5 @@ Contribute by forking the repo and open a pull request.
     - save and load to .csv
     
 # Bugs
-- when resized small the mask on the Menu popup stops masking options
 
 -->

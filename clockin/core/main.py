@@ -15,11 +15,7 @@ def app(stdscr):
     term_height, term_width = stdscr.getmaxyx()
     
     tasks = Tasks()
-    tasks.add("first")
-    tasks.add("second")
-    tasks.add("t3")
-    tasks.add("t4")
-    tasks.add("t5")
+    tasks.load_file("data.csv")
     
     keys = Keys(stdscr)
     
