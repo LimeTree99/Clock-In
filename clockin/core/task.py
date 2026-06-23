@@ -62,6 +62,9 @@ class Tasks:
         else:
             return self.tasks[self.task_names[self.selected]]
         
+    def event(self, start: float, end: float):
+        self.tasks[self.task_names[self.selected]].add_event(start, end)
+        
     def load_file(self, filename: str):
         with open(filename, 'r') as csvfile:
             csvreader = csv.DictReader(csvfile)  

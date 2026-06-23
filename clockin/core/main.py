@@ -22,13 +22,19 @@ def app(stdscr):
     logo = Pad(8, 1, [1,1], bd=True)
     logo.addstr("Clock In")
     
+    log = Log(width=term_width//2-3, 
+              height=term_height-6, 
+              vec=(term_width//2+1, 4), 
+              title="Log", 
+              bd=True)
+    
     popup = Popup_container(width=20, 
                             height=5,
                             vec=(term_width//2-20//2, term_height//2-5//2), 
                             title="Popup", 
                             bd="True")
     
-    timer = Timer(term_width-13, 1, [11, 1], tasks, bd=True)
+    timer = Timer(term_width-13, 1, [11, 1], tasks, log, bd=True)
     tasks_menu = Task_menu(width=term_width//2-2, 
                            height=term_height-6, 
                            vec=[1, 4], 
@@ -36,11 +42,6 @@ def app(stdscr):
                            popup=popup,
                            title="Tasks", 
                            bd=True)
-    log = Log(width=term_width//2-3, 
-              height=term_height-6, 
-              vec=(term_width//2+1, 4), 
-              title="Log", 
-              bd=True)
     
     
     log.log(">"+"press space to start and stop the task")

@@ -25,10 +25,17 @@ Navigate with the arrow keys and enter. Create a new task and start the timer wi
 -->
 
 <!--
-# Todo
+# Todo for version 1.0
 - events:
-    - save and load to .csv
+    - save and load to data.csv
+- list menu:
+    - make it scroleable
+- quit:
+    - quit with q
+    - save data.csv
     
 # Bugs
+- if task is deleted while currently running it is replaced by the next one in the list
+    - fix: make it so you can't delete an activly runnign task
 
 -->

@@ -397,9 +397,10 @@ class Task_menu(List_menu):
 
 
 class Timer(Pad):
-    def __init__(self, width: int, height: int, vec, tasks: Tasks, **kargs: dict):
+    def __init__(self, width: int, height: int, vec, tasks: Tasks, log: Log, **kargs: dict):
         super().__init__(width, height, vec, **kargs)
         self.tasks = tasks
+        self.log = log
         self.active = False
         self.timestart = None
         self.timeend = None
@@ -417,6 +418,8 @@ class Timer(Pad):
         self.timeend = time.time()
         self.flash(Color.RED, 0.5)
         self.timing = False
+        self.tasks.event(self.timestart, self.timeend)
+        self.log.log(f"{self.tasks.get_selected().name} duration: {self.gettime()}")
     
     def update(self, keys: Keys):
         if keys.checkkey() == Keys.KEY_SPACE and self.tasks.get_selected() != None:
