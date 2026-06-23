@@ -2,10 +2,14 @@
 <img src="https://raw.githubusercontent.com/LimeTree99/Clock-In/1a30d184a742926481fbca5b17e9a8acf2b10dd2/assets/logo%20card.svg" width="200">
 </a>
 
-# Clock In
+
+Clock In
+========
+<div align="left">
 A time keeping teminal application. Great for anyone wanting to keep track of how much time they spend on different tasks.
 
-# Dependencies
+Dependencies
+------------
 Python and the `curses` module
 
 # Quick Start
