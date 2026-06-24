@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/LimeTree99/Clock-In/1a30d184a742926481fbca5b17e9a8acf2b10dd2/assets/logo%20card.png" width="200">
+<img src="https://raw.githubusercontent.com/LimeTree99/Clock-In/refs/heads/main/assets/logo%20card.png" width="200">
 </a>
 
 
