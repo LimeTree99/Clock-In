@@ -2,7 +2,6 @@
 <img src="https://raw.githubusercontent.com/LimeTree99/Clock-In/refs/heads/main/assets/logo%20card.png" width="200">
 </a>
 
-
 Clock In
 ========
 <div align="left">
@@ -10,13 +9,14 @@ A time keeping teminal application. Great for anyone wanting to keep track of ho
 
 Dependencies
 ------------
-Python and the `curses` module
+Python and the `curses` module. If on windows use `pip install windows-curses` to install the required repository.
 
-# Quick Start
+Quick Start
+-----------
 Clone or download the repository and run `clockin.py`
-<!-- -->
 
-# Getting Started
+Getting Started
+---------------
 Navigate with the arrow keys and enter. Create a new task and start the timer with the spacebar. 
 
 
