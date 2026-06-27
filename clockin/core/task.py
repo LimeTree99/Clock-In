@@ -33,6 +33,8 @@ class Tasks:
             self.tasks[task.name] = task
             self.task_names.append(task.name)
         self.selected = None
+        self.csv_fields = ['task','start','end']
+        self.csv_file = None
         
     def add(self, task_name: str):
         self.tasks[task_name] = Task(task_name)
@@ -64,8 +66,10 @@ class Tasks:
         
     def event(self, start: float, end: float):
         self.tasks[self.task_names[self.selected]].add_event(start, end)
+        self.append_file(self.task_names[self.selected], start, end)
         
     def load_file(self, filename: str):
+        self.csv_file = filename
         with open(filename, 'r') as csvfile:
             csvreader = csv.DictReader(csvfile)  
             for row in csvreader:
@@ -73,10 +77,13 @@ class Tasks:
                     self.add(row['task'])
                 self.tasks[row['task']].add_event(row['start'], row['end'])
                 
-                    
-                
-
+    def append_file(self, task: Task, start: float, end: float):
+        with open(self.csv_file, 'a', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.csv_fields)
+            writer.writerow({self.csv_fields[0]:task,
+                             self.csv_fields[1]:start,
+                             self.csv_fields[2]:end})
             
-    
+                
     def save_file(self, filename: str):
         pass

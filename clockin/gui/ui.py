@@ -175,7 +175,6 @@ class List_menu(Pad):
         if self.selected in self.mask_options:
             self.next()
         
-        
         self.active = start_active
         
         self.key = Keys(self._pad)
@@ -199,12 +198,26 @@ class List_menu(Pad):
                 pass
         
         self._pad.clear()
-        for i in range(len(self.options)):
-            if i == self.selected:
-                self.addstr(f"{self.options[i]}", attr=curses.A_UNDERLINE)
-            else:
-                self.addstr(f"{self.options[i]}")
+        
+        if self.selected < self.height - 1: 
+            for i in range(min(len(self.options), self.height)):
+                if i == self.selected:
+                    self.addstr(f"{self.options[i]}", attr=curses.A_UNDERLINE)
+                else:
+                    self.addstr(f"{self.options[i]}")
+                self.addstr(" \n")
+        elif self.selected == len(self.options) - 1:
+            for i in range(self.height-1):
+                self.addstr(f"{self.options[self.selected - self.height + i + 1]} \n")
+            self.addstr(f"{self.options[-1]}", attr=curses.A_UNDERLINE)
+        else:
+            for i in range(self.height-2):
+                self.addstr(f"{self.options[self.selected - self.height + i + 2]} \n")
+            
+            self.addstr(f"{self.options[self.selected]}", attr=curses.A_UNDERLINE)
             self.addstr(" \n")
+            self.addstr(f"{self.options[self.selected+1]} \n")
+        
         
         self.draw()
         
