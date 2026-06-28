@@ -36,8 +36,6 @@ Navigate with the arrow keys and enter. Create a new task and start the timer wi
 # Todo for version 1.0
 - events:
     - save and load to data.csv
-- list menu:
-    - make it scroleable
 - quit:
     - quit with q
     - save data.csv

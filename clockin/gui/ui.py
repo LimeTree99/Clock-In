@@ -376,7 +376,7 @@ class Task_menu(List_menu):
     def delete_task(self):
         def check(name):
             def delete_this_task(name):
-                self.tasks.pop(name)
+                self.tasks.delete(name)
                 self.exit_popup()
             
             self.popup.destroy()

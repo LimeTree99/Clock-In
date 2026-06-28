@@ -1,4 +1,5 @@
 import csv
+import pandas as pd
 
 
 class Event:
@@ -40,8 +41,14 @@ class Tasks:
         self.tasks[task_name] = Task(task_name)
         self.task_names.append(task_name)
         
-    def pop(self, task_name: str) -> Task:
+    def delete(self, task_name: str) -> Task:
         self.task_names.remove(task_name)
+        if self.csv_file != None:
+            df = pd.read_csv(self.csv_file)
+            
+            df.drop(df[df.task == task_name].index, inplace=True)
+            
+            df.to_csv(self.csv_file, index=False)
         return self.tasks.pop(task_name)
     
     def get_names(self):
