@@ -39,6 +39,7 @@ def app(stdscr):
                            height=term_height-6, 
                            vec=[1, 4], 
                            tasks=tasks,
+                           timer=timer,
                            popup=popup,
                            title="Tasks", 
                            bd=True)

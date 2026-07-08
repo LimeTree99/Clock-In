@@ -328,15 +328,86 @@ class Popup_container:
             self._pad.resize(width, height, vec)
 
 
+class Timer(Pad):
+    def __init__(self, width: int, height: int, vec, tasks: Tasks, log: Log, **kargs: dict):
+        super().__init__(width, height, vec, **kargs)
+        self.tasks = tasks
+        self.log = log
+        self.active = False
+        self.timestart = None
+        self.timeend = None
+        self.timing = False
+        self.attr = curses.A_NORMAL
+        
+        self.events = Event_loop()
+                
+    def start(self):
+        self.timestart = time.time()
+        self.flash(Color.GREEN, 0.5)
+        self.timing = True
+        
+    def stop(self):
+        self.timeend = time.time()
+        self.flash(Color.RED, 0.5)
+        self.timing = False
+        self.tasks.event(self.timestart, self.timeend)
+        self.log.log(f"{self.tasks.get_selected().name} duration: {self.gettime()}")
+    
+    def zero_time(self):
+        self.timestart = None
+    
+    def update(self, keys: Keys):
+        if keys.checkkey() == Keys.KEY_SPACE and self.tasks.get_selected() != None:
+            keys.usekey()
+            if self.timing:
+                self.stop()
+            else:
+                self.start()
+                
+        self.events.run()
+        
+    def flash(self, color, duration: float):
+        self.attr = color
+        self.events.new(func=lambda: self.set_attr(curses.A_NORMAL), delay=duration, repeat=1)
+        
+    def set_attr(self, attr):
+        self.attr = attr
+    
+    def gettime(self):
+        timestr = ""
+        if self.timestart == None:
+            timestr = "0:00:00"
+        else:
+            if self.timing:
+                self.timeend = time.time()
+                timestr = str(timedelta(seconds=int(self.timeend - self.timestart)))
+            else:
+                timestr = str(timedelta(seconds=int(self.timeend - self.timestart)))
+        
+        return timestr
+    
+    def draw(self):
+        self._pad.clear()
+        if self.tasks.get_selected() == None:
+            task = "Select a task"
+        else: 
+            task = self.tasks.get_selected().name
+            
+        self.addstr(f"{task} | {self.gettime()}", attr=self.attr)
+        return super().draw()
+
+
 class Task_menu(List_menu):
     def __init__(self, 
                  width: int,  
                  height: int, 
                  tasks: Tasks,
+                 timer: Timer,
                  vec: tuple[int, int],
                  popup: Popup_container,
                  **kargs: dict):
         self.tasks = tasks
+        self.timer = timer
         funcs = [lambda name=name: self.select_task(name) for name in self.tasks.get_names()]
         
         funcs = funcs + [lambda: "hold", self.add_task, self.delete_task]
@@ -406,70 +477,9 @@ class Task_menu(List_menu):
                                      title="Delete Task"))
         
     def select_task(self, name):
+        if self.timer.timing:
+            self.timer.stop()
         self.tasks.set_selected(name)
+        self.timer.zero_time()
 
 
-class Timer(Pad):
-    def __init__(self, width: int, height: int, vec, tasks: Tasks, log: Log, **kargs: dict):
-        super().__init__(width, height, vec, **kargs)
-        self.tasks = tasks
-        self.log = log
-        self.active = False
-        self.timestart = None
-        self.timeend = None
-        self.timing = False
-        self.attr = curses.A_NORMAL
-        
-        self.events = Event_loop()
-                
-    def start(self):
-        self.timestart = time.time()
-        self.flash(Color.GREEN, 0.5)
-        self.timing = True
-        
-    def stop(self):
-        self.timeend = time.time()
-        self.flash(Color.RED, 0.5)
-        self.timing = False
-        self.tasks.event(self.timestart, self.timeend)
-        self.log.log(f"{self.tasks.get_selected().name} duration: {self.gettime()}")
-    
-    def update(self, keys: Keys):
-        if keys.checkkey() == Keys.KEY_SPACE and self.tasks.get_selected() != None:
-            keys.usekey()
-            if self.timing:
-                self.stop()
-            else:
-                self.start()
-                
-        self.events.run()
-        
-    def flash(self, color, duration: float):
-        self.attr = color
-        self.events.new(func=lambda: self.set_attr(curses.A_NORMAL), delay=duration, repeat=1)
-        
-    def set_attr(self, attr):
-        self.attr = attr
-    
-    def gettime(self):
-        timestr = ""
-        if self.timestart == None:
-            timestr = "0:00:00"
-        else:
-            if self.timing:
-                self.timeend = time.time()
-                timestr = str(timedelta(seconds=int(self.timeend - self.timestart)))
-            else:
-                timestr = str(timedelta(seconds=int(self.timeend - self.timestart)))
-        
-        return timestr
-    
-    def draw(self):
-        self._pad.clear()
-        if self.tasks.get_selected() == None:
-            task = "Select a task"
-        else: 
-            task = self.tasks.get_selected().name
-            
-        self.addstr(f"{task} | {self.gettime()}", attr=self.attr)
-        return super().draw()
