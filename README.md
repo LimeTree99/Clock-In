@@ -7,6 +7,8 @@ Clock In
 <div align="left">
 A time keeping teminal application. Great for anyone wanting to keep track of how much time they spend on different tasks.
 
+<img src="assets/screenshot-1.PNG">
+
 Dependencies
 ------------
 Python and the `curses` module. If on windows use `pip install windows-curses` to install the required repository.
