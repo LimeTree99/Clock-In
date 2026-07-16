@@ -174,6 +174,7 @@ class List_menu(Pad):
         self.selected = 0
         if self.selected in self.mask_options:
             self.next()
+        self.view_offset = 0
         
         self.active = start_active
         
@@ -199,25 +200,22 @@ class List_menu(Pad):
         
         self._pad.clear()
         
-        if self.selected < self.height - 1: 
-            for i in range(min(len(self.options), self.height)):
-                if i == self.selected:
-                    self.addstr(f"{self.options[i]}", attr=curses.A_UNDERLINE)
-                else:
-                    self.addstr(f"{self.options[i]}")
-                self.addstr(" \n")
-        elif self.selected == len(self.options) - 1:
-            for i in range(self.height-1):
-                self.addstr(f"{self.options[self.selected - self.height + i + 1]} \n")
-            self.addstr(f"{self.options[-1]}", attr=curses.A_UNDERLINE)
-        else:
-            for i in range(self.height-2):
-                self.addstr(f"{self.options[self.selected - self.height + i + 2]} \n")
-            
-            self.addstr(f"{self.options[self.selected]}", attr=curses.A_UNDERLINE)
-            self.addstr(" \n")
-            self.addstr(f"{self.options[self.selected+1]} \n")
+        if self.selected == 0:
+            self.view_offset = 0
+        elif self.selected >= self.height + self.view_offset - 1:
+            self.view_offset += 1
+        elif self.selected < self.view_offset + 1:
+            self.view_offset -= 1
         
+        
+        
+        for i in range(min(len(self.options)-self.view_offset, self.height)):
+            option = i + self.view_offset
+            if option == self.selected:
+                self.addstr(f"{self.options[option]}", attr=curses.A_UNDERLINE)
+            else:
+                self.addstr(f"{self.options[option]}")
+            self.addstr(" \n")
         
         self.draw()
         
@@ -461,8 +459,7 @@ class Task_menu(List_menu):
                              bd=True,
                              title=f"Delete Task")
             menu.attron(Color.RED)
-            self.popup.set_pad(menu)
-            
+            self.popup.set_pad(menu)    
         
         self.deactivate()
         funcs = [self.exit_popup,'']

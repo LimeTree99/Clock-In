@@ -45,10 +45,10 @@ def app(stdscr):
                            bd=True)
     
     
-    log.log(">"+"press space to start and stop the task")
-    log.log(">"+"select the task")
-    log.log(">"+"select create a task")
-    log.log(">"+"navigate with arrow keys and [enter] to select an option")
+    log.log("4. "+"press space to start and stop the task")
+    log.log("3. "+"select the task")
+    log.log("2. "+"select create a task")
+    log.log("1. "+"navigate with arrow keys and [enter] to select an option")
     
     tasks_menu.activate()
     
