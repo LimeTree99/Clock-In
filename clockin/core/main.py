@@ -44,12 +44,12 @@ def app(stdscr):
                            title="Tasks", 
                            bd=True)
     
-    
+    """
     log.log("4. "+"press space to start and stop the task")
     log.log("3. "+"select the task")
     log.log("2. "+"select create a task")
     log.log("1. "+"navigate with arrow keys and [enter] to select an option")
-    
+    """
     tasks_menu.activate()
     
     draw_list = [tasks_menu, log, timer, logo, popup]

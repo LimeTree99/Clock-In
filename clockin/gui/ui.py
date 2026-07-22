@@ -200,15 +200,19 @@ class List_menu(Pad):
         
         self._pad.clear()
         
-        if self.selected == 0:
-            self.view_offset = 0
-        elif self.selected >= self.height + self.view_offset - 1:
-            self.view_offset += 1
-        elif self.selected < self.view_offset + 1:
-            self.view_offset -= 1
+        # adjust the view offset 
+        if len(self.options) > self.height:
+            if self.selected == 0:
+                self.view_offset = 0
+            elif self.selected == len(self.options) - 1:
+                self.view_offset = len(self.options) - self.height
+            elif self.selected >= self.height + self.view_offset - 1:
+                #when moving down
+                self.view_offset += 1
+            elif self.selected <= self.view_offset + 1:
+                self.view_offset -= 1
         
-        
-        
+        # draw routine        
         for i in range(min(len(self.options)-self.view_offset, self.height)):
             option = i + self.view_offset
             if option == self.selected:
